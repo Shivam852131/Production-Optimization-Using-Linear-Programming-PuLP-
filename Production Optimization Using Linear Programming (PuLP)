@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""
+CODTECH Internship Task-4
+Optimization Model – Production Optimization Using Linear Programming
+"""
+
+# Import PuLP library
+from pulp import LpMaximize, LpProblem, LpVariable, LpStatus, value
+
+# Step 1: Create the Linear Programming problem
+model = LpProblem("Production_Optimization", LpMaximize)
+
+# Step 2: Define decision variables
+# x = number of Product A units, y = number of Product B units
+x = LpVariable("Product_A", lowBound=0, cat="Continuous")
+y = LpVariable("Product_B", lowBound=0, cat="Continuous")
+
+# Step 3: Define objective function (maximize profit)
+# Profit = 20x + 30y
+model += 20 * x + 30 * y, "Total_Profit"
+
+# Step 4: Add constraints
+# Labor constraint: 2x + 3y ≤ 100 hours
+model += 2 * x + 3 * y <= 100, "Labor_Hours"
+
+# Material constraint: 4x + 3y ≤ 120 units
+model += 4 * x + 3 * y <= 120, "Material_Used"
+
+# Demand constraint: x ≤ 30, y ≤ 40
+model += x <= 30, "Max_Product_A"
+model += y <= 40, "Max_Product_B"
+
+# Step 5: Solve the model
+model.solve()
+
+# Step 6: Display results
+print("===== OPTIMIZATION RESULTS =====")
+print(f"Status: {LpStatus[model.status]}")
+print(f"Optimal number of Product A units: {x.value():.2f}")
+print(f"Optimal number of Product B units: {y.value():.2f}")
+print(f"Maximum Profit: ₹{value(model.objective):.2f}")
+
+# Step 7: Insights
+if LpStatus[model.status] == "Optimal":
+    print("\nInsights:")
+    print("- Production should focus more on high-profit Product B.")
+    print("- Constraints show efficient resource utilization.")
+    print("- Linear programming ensures best use of limited labor and materials.")
